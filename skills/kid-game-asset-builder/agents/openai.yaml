@@ -1,0 +1,7 @@
+interface:
+  display_name: "Kid Game Asset Builder"
+  short_description: "Create kid-friendly 2D game asset packs"
+  default_prompt: "Use $kid-game-asset-builder to create a cohesive asset pack for a small kid-friendly game."
+
+policy:
+  allow_implicit_invocation: true
