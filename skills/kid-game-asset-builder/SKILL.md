@@ -23,15 +23,37 @@ Create cohesive asset packs for small 2D games:
 When details are missing, optimize for fast kid-game momentum:
 - audience: playful, readable, non-scary
 - style: colorful clean pixel art or soft cartoon sprites
-- character frame size: 64x64
-- small objects: 32x32 or 48x48
+- asset sizing: recommend a practical starting point, but do not make size the focus
 - walk cycles: 4 frames
 - idle cycles: 2 frames
 - background: 16:9 static plus optional parallax layers
-- tiles: 32x32 or 48x48, with clear collision edges
+- tiles: cleanly aligned, with clear collision edges
 - scope: one cohesive theme before expanding variants
 
 If the project needs exact engine constraints, ask one concise clarification round. Otherwise proceed with these defaults and list assumptions.
+
+## Size and refinement policy
+
+Treat resolution as an output decision, not the creative center of the skill.
+
+Use size recommendations only to help the user choose a practical workflow:
+- pixel/platformer prototype: 32-64 px tiles and 48-96 px characters
+- cozy cartoon or storybook game: 128-512 px characters/props
+- HD hand-painted or board-game style: 512-1024 px characters/props
+- backgrounds: match the target viewport or generate larger for cropping/parallax
+
+Warn briefly when the requested assets are large or numerous:
+- larger assets may take more iterations
+- animation consistency can be harder at high detail
+- tilesets may need individual-tile generation instead of one big sheet
+- a quick draft pass can save time before final-resolution refinement
+
+Prefer this loop for uncertain styles:
+1. Make a quick concept pass with fewer assets and lower detail.
+2. Pick the strongest style anchor.
+3. Generate final-resolution hero/background/tile anchors.
+4. Expand the pack using those anchors.
+5. Refine or upscale only the approved assets.
 
 ## Kid collaboration intake
 
@@ -90,19 +112,20 @@ Use after a base style exists:
 
 ## Workflow
 
-1. Establish an art direction anchor: theme, palette, camera, line weight, shading, and target frame sizes.
+1. Establish an art direction anchor: theme, palette, camera, line weight, shading, intended game style, and rough asset scale.
 2. Generate a hero neutral pose first as the visual anchor.
 3. Reuse anchor tokens for every related character frame.
-4. Generate one asset family at a time: characters, then tiles, then backgrounds, then props/UI/effects.
-5. Keep gameplay readability first: silhouettes, collision edges, and important interactables must be obvious.
-6. Save assets into the standard layout and write or update the manifest.
-7. Run a quality pass for transparency, cropping, scale, style consistency, and naming.
+4. If the style is not locked, do a small draft pass before producing final-resolution assets.
+5. Generate one asset family at a time: characters, then tiles, then backgrounds, then props/UI/effects.
+6. Keep gameplay readability first: silhouettes, collision edges, and important interactables must be obvious.
+7. Save assets into the standard layout and write or update the manifest.
+8. Run a quality pass for transparency, cropping, scale, style consistency, and naming.
 
 ## Prompt recipes
 
 ### Character sprite
 
-Create a [STYLE] game sprite of [CHARACTER], [VIEW], designed for [FRAME_SIZE] pixels per frame. Full body visible, centered, uncropped. Transparent background only. Strong silhouette, readable at small scale. Keep design consistent with: [ANCHOR TOKENS]. Mood: playful and kid-friendly. Output: [STATE/ACTION], frame [N] of [TOTAL].
+Create a [STYLE] game sprite of [CHARACTER], [VIEW], for [GAME_STYLE / TARGET_USE]. Full body visible, centered, uncropped. Transparent background only. Strong silhouette, readable at the intended gameplay scale. Keep design consistent with: [ANCHOR TOKENS]. Mood: playful and kid-friendly. Output: [STATE/ACTION], frame [N] of [TOTAL]. If a target size is known, prepare it for [TARGET_SIZE]; otherwise prioritize clean shape and consistent design over exact pixel dimensions.
 
 ### Background
 
@@ -110,19 +133,19 @@ Create a [STYLE] 2D game background for a [GAME_TYPE] set in [WORLD], designed f
 
 ### Tileset
 
-Create a cohesive [STYLE] tileset for [GAME_TYPE], [TILE_SIZE] pixels per tile, set in [WORLD]. Include ground center, left edge, right edge, inner corner, outer corner, floating platform, wall, background filler, decorative variant, and hazard tile. Clear readable collision edges. No text. Output on a clean grid.
+Create a cohesive [STYLE] tileset for [GAME_TYPE], set in [WORLD]. Include ground center, left edge, right edge, inner corner, outer corner, floating platform, wall, background filler, decorative variant, and hazard tile. Clear readable collision edges. No text. Output on a clean grid. If a target tile size is known, prepare it for [TARGET_TILE_SIZE]; otherwise prioritize tile clarity, repeatability, and consistent edges.
 
 ### Props and collectibles
 
-Create [COUNT] [STYLE] game props for [WORLD], each readable at [SIZE] pixels, transparent background, centered, uncropped, consistent palette. Include: [OBJECT LIST]. Make each object distinct in silhouette and easy for a child to recognize.
+Create [COUNT] [STYLE] game props for [WORLD], transparent background, centered, uncropped, consistent palette. Include: [OBJECT LIST]. Make each object distinct in silhouette and easy for a child to recognize at the intended gameplay scale. If a final size is known, prepare each prop for [TARGET_SIZE].
 
 ### UI icons
 
-Create a [STYLE] kid-friendly game UI icon set with transparent background, readable at [SIZE] pixels. Include: hearts, star counter, coin counter, pause, restart, locked, unlocked, trophy, and settings. Match the asset pack palette: [PALETTE].
+Create a [STYLE] kid-friendly game UI icon set with transparent background, readable in the target interface. Include: hearts, star counter, coin counter, pause, restart, locked, unlocked, trophy, and settings. Match the asset pack palette: [PALETTE]. If a final icon size is known, prepare icons for [TARGET_SIZE].
 
 ### Effects
 
-Create [STYLE] 2D game effect frames for [EFFECT], transparent background, centered, no text. Designed for [FRAME_SIZE] pixels per frame. Motion should read clearly across [TOTAL] frames.
+Create [STYLE] 2D game effect frames for [EFFECT], transparent background, centered, no text. Motion should read clearly across [TOTAL] frames at the intended gameplay scale. If a target size is known, prepare frames for [TARGET_SIZE].
 
 ## Output layout
 
@@ -153,10 +176,19 @@ Use JSON so game code can consume the pack:
   "project": "project-name",
   "style": "clean pixel art",
   "palette": ["#000000"],
-  "frameSize": {
-    "characters": 64,
-    "tiles": 32,
-    "ui": 32
+  "assetScale": {
+    "mode": "draft|final",
+    "recommendations": {
+      "characters": "48-96 px for pixel prototypes; 128-512 px for cartoon/storybook",
+      "tiles": "32-64 px for pixel prototypes; larger when the game style needs it",
+      "ui": "match the target interface scale"
+    },
+    "finalTargets": {
+      "characters": null,
+      "tiles": null,
+      "ui": null,
+      "backgrounds": null
+    }
   },
   "characters": {},
   "enemies": {},
